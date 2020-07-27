@@ -1,5 +1,8 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import Post
+from .forms import PostForm
+from django.contrib import messages
+
 # Create your views here.
 
 def allPosts(request):
@@ -22,3 +25,43 @@ def detailPost(request,id):
 
     }
     return  render(request,'Post/jobDetail.html',context)
+
+
+
+
+def create_post(request):
+    if request.method=='POST':
+        form=PostForm(request.POST)
+        if form.is_valid():
+            new_form=form.save(commit=False)
+            new_form.user=request.user
+            new_form.save()
+            messages.success(request, 'Post created successfully')
+            return redirect('/')
+
+    else:
+        form = PostForm()
+
+    context={
+
+        'form':form,
+    }
+    return  render(request,'Post/create.html',context)
+
+def editPost(request,id):
+    detailPost=get_object_or_404(Post,id=id)
+    if request.method == 'POST':
+        form = PostForm(request.POST,instance=detailPost)
+        if form.is_valid():
+            new_form = form.save(commit=False)
+            new_form.user = request.user
+            new_form.save()
+            return redirect('/')
+    else:
+        form = PostForm(instance=detailPost)
+
+    context = {
+
+        'form': form,
+    }
+    return render(request,'Post/edit.html', context)
