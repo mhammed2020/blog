@@ -3,10 +3,21 @@ from .models import Post
 from .forms import PostForm
 from django.contrib import messages
 
+from django.core.paginator import Paginator
+
 # Create your views here.
 
 def allPosts(request):
     posts = Post.objects.all()
+
+    ##pagination
+    posts = Post.objects.all()
+
+    paginator = Paginator(posts, 3)  # Show 25 contacts per page.
+
+    page = request.GET.get('page')
+    posts = paginator.get_page(page)
+
     context= {
         'posts':posts,
 
